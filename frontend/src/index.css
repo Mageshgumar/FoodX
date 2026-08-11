@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Legacy custom styles appended for the initial scaffold */
+:root{ --accent:#ff6b35; --bg:#f8f6f2; --card:#ffffff }
+body,html,#root{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg)}
+.app-root{min-height:100vh}
+.hero{height:220px;background-image:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=2000&q=60');background-size:cover;background-position:center;display:flex;align-items:center;color:#fff}
+.hero .overlay{padding:24px}
+.hero h1{margin:0;font-size:28px}
+.hero p{margin:6px 0 0}
+.panels{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:18px}
+.panel{background:var(--card);padding:16px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;text-align:left;border-bottom:1px solid #eee}
+@media(max-width:900px){.panels{grid-template-columns:1fr}}

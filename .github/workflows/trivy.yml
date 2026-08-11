@@ -1,0 +1,62 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  filesystem-scan:
+    name: Filesystem Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: table
+          exit-code: '1'
+          scanners: vuln,secret,config
+
+  image-scan:
+    name: Container Image Scan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: backend
+            context: ./backend
+            image: foodx-backend:ci
+          - name: frontend
+            context: ./frontend
+            image: foodx-frontend:ci
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.name }} image
+        run: docker build -t ${{ matrix.image }} ${{ matrix.context }}
+
+      - name: Run Trivy image scan (${{ matrix.name }})
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ matrix.image }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: table
+          exit-code: '1'
+          vuln-type: os,library
