@@ -10,13 +10,13 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                bat 'docker compose build'
+                bat 'docker-compose build'
             }
         }
 
         stage('Start FoodX') {
             steps {
-                bat 'docker compose up -d'
+                bat 'docker-compose up -d'
             }
         }
 
@@ -39,7 +39,7 @@ pipeline {
         }
 
         failure {
-            bat 'docker compose logs --no-color'
+            bat 'docker-compose logs --no-color'
         }
     }
 }
