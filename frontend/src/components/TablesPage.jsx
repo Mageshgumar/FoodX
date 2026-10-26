@@ -38,6 +38,10 @@ export default function TablesPage(){
     }
   }
 
+  function getStatusLabel(status){
+    return status === 'Available' ? 'Vacant' : status
+  }
+
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
@@ -62,7 +66,7 @@ export default function TablesPage(){
           {tables.map(t=> (
             <div key={t._id} className={`rounded-lg border p-3 text-center ${t.status==='Occupied' ? 'bg-red-100' : t.status==='Reserved' ? 'bg-yellow-100' : 'bg-green-50'}`}>
               <div className="font-semibold">Table {t.tableNumber}</div>
-              <div className="text-sm text-gray-600">{t.status}</div>
+              <div className="text-sm text-gray-600">{getStatusLabel(t.status)}</div>
               <div className="mt-2 flex flex-wrap justify-center gap-1">
                 <button onClick={()=>updateTable(t._id,'Available')} className="rounded bg-green-500 px-2 py-1 text-sm text-white">Free</button>
                 <button onClick={()=>updateTable(t._id,'Occupied')} className="rounded bg-red-500 px-2 py-1 text-sm text-white">Occupy</button>

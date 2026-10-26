@@ -38,6 +38,30 @@ const TableSchema = new Schema({
 });
 const Table = mongoose.model('Table', TableSchema);
 
+async function ensureTablesExist() {
+  if (await Table.exists({})) {
+    return;
+  }
+
+  const defaultTables = [
+    { tableNumber: 1, status: 'Occupied' },
+    { tableNumber: 2, status: 'Available' },
+    { tableNumber: 3, status: 'Reserved' },
+    { tableNumber: 4, status: 'Occupied' },
+    { tableNumber: 5, status: 'Available' },
+    { tableNumber: 6, status: 'Available' },
+    { tableNumber: 7, status: 'Reserved' },
+    { tableNumber: 8, status: 'Occupied' },
+    { tableNumber: 9, status: 'Available' },
+    { tableNumber: 10, status: 'Occupied' },
+    { tableNumber: 11, status: 'Available' },
+    { tableNumber: 12, status: 'Reserved' }
+  ];
+
+  await Table.insertMany(defaultTables);
+  console.log('Created default tables:', defaultTables.length);
+}
+
 // Routes
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
@@ -126,6 +150,7 @@ app.post('/api/inventory', async (req, res) => {
 
 // Tables
 app.get('/api/tables', async (req, res) => {
+  await ensureTablesExist();
   const t = await Table.find();
   res.json(t);
 });
