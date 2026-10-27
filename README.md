@@ -25,6 +25,7 @@ Jenkins on Windows:
 - The Jenkins agent must be able to reach a running Docker Engine before the pipeline starts. On Docker Desktop, start Docker Desktop and verify `docker info` succeeds under the same Windows account/service context used by Jenkins.
 - If Jenkins runs as a Windows service, configure that service to use an account with permission to access Docker Desktop, or run the agent in a context where the Docker Engine is available.
 - The pipeline performs this check in the `Verify Docker` stage and skips failure-log collection when the daemon is unavailable, so the original Docker error remains the reported failure.
+- After startup, the pipeline prints the Compose service status and retries the backend health endpoint for up to 60 seconds before reporting a failure.
 
 If you prefer running without Docker:
 - Backend:

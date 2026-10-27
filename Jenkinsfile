@@ -22,6 +22,11 @@ pipeline {
                         echo Docker Buildx is required by Docker Compose builds but is not available to Jenkins.
                         exit /b 1
                     )
+                    docker-compose version >nul 2>&1
+                    if errorlevel 1 (
+                        echo Docker Compose is not available to Jenkins.
+                        exit /b 1
+                    )
                 '''
             }
         }
@@ -38,15 +43,17 @@ pipeline {
             }
         }
 
-        stage('Wait for Services') {
+        stage('Show Service Status') {
             steps {
-                sleep 15
+                bat 'docker-compose ps'
             }
         }
 
         stage('Health Check') {
             steps {
-                bat 'powershell -NoProfile -Command "$response = Invoke-WebRequest http://localhost:5000/api/health -UseBasicParsing; if ($response.StatusCode -ne 200) { exit 1 }"'
+                bat '''
+                    powershell -NoProfile -Command "$ErrorActionPreference = 'Stop'; $url = 'http://localhost:5000/api/health'; for ($attempt = 1; $attempt -le 12; $attempt++) { try { $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5; if ($response.StatusCode -eq 200) { Write-Host ('Health check passed on attempt ' + $attempt); exit 0 } } catch { Write-Host ('Health check attempt ' + $attempt + ' failed: ' + $_.Exception.Message) }; Start-Sleep -Seconds 5 }; Write-Error ('Health check failed after ' + $attempt + ' attempts'); docker-compose logs --no-color backend; exit 1"
+                '''
             }
         }
     }
