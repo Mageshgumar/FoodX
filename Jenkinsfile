@@ -8,6 +8,24 @@ pipeline {
             }
         }
 
+        stage('Verify Docker') {
+            steps {
+                bat '''
+                    @echo off
+                    docker info >nul 2>&1
+                    if errorlevel 1 (
+                        echo Docker is not available to Jenkins. Start Docker Desktop and ensure the Jenkins service can access the Docker engine.
+                        exit /b 1
+                    )
+                    docker buildx version >nul 2>&1
+                    if errorlevel 1 (
+                        echo Docker Buildx is required by Docker Compose builds but is not available to Jenkins.
+                        exit /b 1
+                    )
+                '''
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 bat 'docker-compose build'
@@ -39,7 +57,16 @@ pipeline {
         }
 
         failure {
-            bat 'docker-compose logs --no-color'
+            bat '''
+                @echo off
+                docker info >nul 2>&1
+                if errorlevel 1 (
+                    echo Skipping Docker logs because the Docker daemon is unavailable.
+                    exit /b 0
+                )
+                docker-compose logs --no-color
+                exit /b 0
+            '''
         }
     }
 }
